@@ -114,4 +114,4 @@ dist
 .yarn/build-state.yml
 .pnp.*
 
-user_data
+cookies.json
