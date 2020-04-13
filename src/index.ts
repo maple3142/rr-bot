@@ -68,16 +68,26 @@ let browser: Browser
 		})
 		if (!(await page.$('#header_my_avatar'))) {
 			console.log('Login: not logged in, manual login required')
-			const href = (await page.$eval(
+			const href = await page.$eval(
 				selectors[argv.login as LoginMethod],
-				(el) => el.getAttribute('href')
-			)) as string
-			await page.goto(href, {
-				waitUntil: 'networkidle0'
-			})
-			await page.waitForResponse('https://rivalregions.com/', {
-				timeout: 0
-			})
+				(el) => (<any>el).href
+			)
+			await page.goto(href)
+			await page.waitForResponse(
+				(resp) => {
+					const url = resp.url()
+					return (
+						url.includes('https://rivalregions.com/main/fblogin') ||
+						url.includes(
+							'https://rivalregions.com/rival/googles'
+						) ||
+						url.includes('https://rivalregions.com/main/vklogin')
+					)
+				},
+				{
+					timeout: 0
+				}
+			)
 			await page.waitFor('#chat input[name=name]')
 			console.log('Login: manual login success')
 			return true // true means manual login is used
